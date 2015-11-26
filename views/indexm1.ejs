@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+
+    <ng-view></ng-view>
+
+    <!-- Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.min.js"></script>
+
+    <!-- Template -->
+    <script type="text/ng-template" id="/todos.html">
+      <ul>
+        <li ng-repeat="todo in todos">
+          <input type="checkbox" ng-model="todo.completed">
+         {{todo.name}}
+        </li>
+      </ul>
+      New task <input type="text" ng-model="newTodo"><button ng-click="save()">Create</button>
+    </script>
+
+    <script>
+      angular.module('app', ['ngRoute', 'ngResource'])
+
+        //---------------
+        // Services
+        //---------------
+
+        .factory('Todos', ['$resource', function($resource){
+          return $resource('/todos/:id', null, {
+            'update': { method:'PUT' }
+          });
+        }])
+
+
+        //---------------
+        // Controllers
+        //---------------
+
+        .controller('TodoController', function ($scope, Todos) {
+            $scope.editing = [];
+            $scope.todos = Todos.query();
+        })
+
+        
+
+        //---------------
+        // Routes
+        //---------------
+
+        .config(['$routeProvider', function ($routeProvider) {
+          $routeProvider
+            .when('/', {
+              templateUrl: '/todos.html',
+              controller: 'TodoController'
+            });
+        }]);
+    </script>
+   </body>
+ </html>
